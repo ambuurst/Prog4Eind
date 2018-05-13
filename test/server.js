@@ -33,7 +33,7 @@ describe('Hello', () => {
 
     it('(GET) all the cpus', (done) => {
         chai.request(server)
-            .get('/apiv2/inte/cpu/2013')
+            .get('/apiv2/intel/cpu/2013')
             .end(function (err, res) {
                 res.should.have.status(200);
                 res.body.should.be.a('array');
