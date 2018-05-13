@@ -82,7 +82,7 @@ router.get('/intel/:year?', function(req, res, next) {
             return ( item.info.year == year );
         })
     } else {
-        result = intel_microarchitecture;
+        result = db;
     }
 
     res.json(result);
