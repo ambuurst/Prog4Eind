@@ -1,0 +1,8 @@
+{
+    "secretkey" : "MyFirstServerSuperSecretKey-123454321AbCd-",
+    "dbUsername": "database_name",
+    "dbPassword": "supersecret",
+    "dbSchema"  : "database_schema",
+    "dbServer"  : "localhost",
+    "port"      : "3000"
+}

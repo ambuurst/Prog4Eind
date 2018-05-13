@@ -1,0 +1,24 @@
+{
+  "name": "myrestfulleserver",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test_default": "echo \"Error: no test specified\" && exit 1",
+    "test": "./node_modules/.bin/mocha --reporter spec",
+    "start": "node index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.15.2"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "chai-http": "^3.0.0",
+    "mocha": "^3.5.3"
+  },
+  "directories": {
+    "test": "test"
+  },
+  "description": ""
+}
