@@ -67,6 +67,35 @@ router.route('/login')
 
 });
 
+router.route('/register')
+
+    .post( function(req, res) {
+
+        //
+        // Get body params or ''
+        //
+        var username = req.body.username;
+        var lastname = req.body.lastname;
+        var email = req.body.email;
+        var password = req.body.password;
+
+        const query = {
+            sql: 'INSERT INTO `user`(Voornaam, Achternaam, Email, Password) VALUES (?,?,?,?)',
+            values: [username, lastname, email, password],
+            timeout: 2000
+        }
+
+        db.query( query, (error, rows, fields) => {
+            if (error) {
+                res.status(500).json(error.toString())
+            } else {
+                res.status(200).json(rows)
+            }
+        })
+
+    });
+
+
 
 //
 // Sample ENDPOINT
