@@ -45,7 +45,7 @@ user = [{
     password: ""
 }];
 
-// console.log(user)
+console.log(user)
 
 
 
