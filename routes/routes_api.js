@@ -81,6 +81,19 @@ router.get('/studentenhuis', function(req, res, next) {
     })
 });
 
+router.get('/studentenhuis/:huisId?', function(req, res, next) {
+
+    const huisId = req.params.huisId || '';
+
+    db.query('SELECT * FROM studentenhuis WHERE ID = ?', [huisId], (error, rows, fields) => {
+        if (error) {
+            res.status(500).json(error.toString())
+        } else {
+            res.status(200).json(rows)
+        }
+    })
+});
+
 
 
 
