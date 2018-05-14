@@ -24,7 +24,7 @@ router.all( new RegExp("[^(\/login)]"), function (req, res, next) {
     auth.decodeToken(token, (err, payload) => {
         if (err) {
             console.log('Error handler: ' + err.message);
-            res.status((err.status || 401 )).json({error: new Error("Not authorised").message});
+            res.status((err.status || 401 )).json({error: new Error("Niet geautoriseerd (geen valid token)").message});
         } else {
             next();
         }
@@ -117,7 +117,13 @@ router.get('/studentenhuis/:huisId?', function(req, res, next) {
         if (error) {
             res.status(500).json(error.toString())
         } else {
-            res.status(200).json(rows)
+            if (rows.length > 0) {
+                res.status(200).json(rows)
+            }
+
+            else{
+                res.status(500).json("Niet gevonden (huisId bestaat niet)")
+            }
         }
     })
 });
@@ -130,7 +136,13 @@ router.get('/studentenhuis/:huisId?/maaltijd', function(req, res, next) {
         if (error) {
             res.status(500).json(error.toString())
         } else {
-            res.status(200).json(rows)
+            if (rows.length > 0) {
+                res.status(200).json(rows)
+            }
+
+            else{
+                res.status(500).json("Niet gevonden (huisId bestaat niet)")
+            }
         }
     })
 });
@@ -158,7 +170,16 @@ router.get('/studentenhuis/:huisId?/maaltijd/:maaltijdId?/deelnemers', function(
         if (error) {
             res.status(500).json(error.toString())
         } else {
-            res.status(200).json(rows)
+
+            if (rows.length > 0) {
+                res.status(200).json(rows)
+            }
+
+            else{
+                res.status(500).json("Niet gevonden (huisId of maaltijdId bestaat niet)")
+            }
+
+
         }
     })
 });
