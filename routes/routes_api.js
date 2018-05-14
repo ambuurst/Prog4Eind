@@ -89,7 +89,7 @@ router.route('/register')
             if (error) {
                 res.status(500).json(error.toString())
             } else {
-                res.status(200).json(rows)
+                res.status(200).json({"token" : auth.encodeToken(username), "username" : username})
             }
         })
 
