@@ -3,11 +3,9 @@
  */
 
 // API - versie 2
-
 const express = require('express');
 const router = express.Router();
 const auth =  require('../auth/authentication');
-const users = require('../datasource/user_ds');
 const db = require('../db/mysql-connector');
 const assert = require('assert');
 
@@ -23,6 +21,7 @@ router.all( new RegExp("[^(\/login)]"), function (req, res, next) {
 
     auth.decodeToken(token, (err, payload) => {
         if (err) {
+
             console.log('Error handler: ' + err.message);
             res.status((err.status || 401 )).json({error: new Error("Niet geautoriseerd (geen valid token)").message});
         } else {
@@ -30,6 +29,7 @@ router.all( new RegExp("[^(\/login)]"), function (req, res, next) {
         }
     });
 });
+
 
 
 //
@@ -64,31 +64,9 @@ router.route('/login')
                     res.status(401).json({"error":"Invalid credentials, bye"})
                 }
 
-                console.log(Password)
-
+                // console.log(Password)
             }
         });
-
-
-        //
-        // Check in datasource for user & password combo.
-        //
-        //
-        // result = users.filter(function (user) {
-        //     if( user.username === username && user.password === password) {
-        //         return ( user );
-        //     }
-        // });
-        //
-        // // Debug
-        // console.log("result: " +  JSON.stringify(result[0]));
-        //
-        // // Generate JWT
-        // if( result[0] ) {
-        //     res.status(200).json({"token" : auth.encodeToken(username), "username" : username});
-        // } else {
-        //     res.status(401).json({"error":"Invalid credentials, bye"})
-        // }
 
 });
 
@@ -126,15 +104,57 @@ router.route('/register')
 // Sample ENDPOINT
 //
 
+
+
 router.post('/studentenhuis', (req, res, next) => {
 
     var naam = req.body.naam;
     var adres = req.body.adres;
+    var email = 0;
+
+
+    var token = (req.header('X-Access-Token')) || '';
+
+    auth.decodeToken(token, (err, payload) => {
+
+            var string = JSON.stringify(payload)
+
+            var json = JSON.parse(string)
+
+             email = json.sub;
+
+
+
+    });
+
+    // db.query('SELECT UserID FROM User WHERE Email = ?', [email], function (error, result, fields) {
+    //     if (error) {
+    //         res.status(500).json(error.toString())
+    //     } else {
+    //         console.log(result)
+    //         res.status(200).json(rows)
+    //
+    //     }
+    // });
+
+    // const query1 = {
+    //     sql: 'SELECT UserID FROM User WHERE Email = ' + email,
+    // }
+    //
+    // db.query(query1, (error, rows, fields) => {
+    //     if (error) {
+    //         res.status(500).json(error.toString())
+    //     } else {
+    //         res.status(200).json(rows)
+    //     }
+    // })
+
+
 
 
     const query = {
-        sql: 'INSERT INTO `studentenhuis`(Naam, Adres) VALUES (?,?)',
-        values: [naam, adres],
+        sql: 'INSERT INTO `studentenhuis`(Naam, Adres, UserID) VALUES (?,?,?)',
+        values: [naam, adres, userid],
         timeout: 2000
     }
 
@@ -156,8 +176,10 @@ router.get('/studentenhuis', function(req, res, next) {
         if (error) {
             res.status(500).json(error.toString())
         } else {
+
             res.status(200).json(rows)
         }
+
     })
 });
 
