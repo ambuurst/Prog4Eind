@@ -74,10 +74,10 @@ router.route('/register')
         //
         // Get body params or ''
         //
-        var username = "Jaja"//req.body.username;
-        var lastname = "Lala"//req.body.lastname;
-        var email = "jaja@nene.nl" //req.body.email;
-        var password = "password" //req.body.password;
+        var username = req.body.username;
+        var lastname = req.body.lastname;
+        var email = req.body.email;
+        var password = req.body.password;
 
         const query = {
             sql: 'INSERT INTO `user`(Voornaam, Achternaam, Email, Password) VALUES (?,?,?,?)',
