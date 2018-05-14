@@ -128,15 +128,13 @@ router.route('/register')
 
 router.post('/studentenhuis', (req, res, next) => {
 
-    let studentenhuis = req.body;
+    var naam = req.body.naam;
+    var adres = req.body.adres;
 
-    assert.equal(typeof (req.body.naam), 'string', "Argument 'naam' must be a string.");
-    assert.equal(typeof (req.body.adres), 'string', "Argument 'adres' must be a string.");
-    assert.equal(typeof (req.body.userId), 'string', "Argument 'userId' must be a string.");
 
     const query = {
-        sql: 'INSERT INTO `studentenhuis`(Naam, Adres, UserID) VALUES (?,?,?)',
-        values: [studentenhuis.naam, studentenhuis.adres, studentenhuis.userId],
+        sql: 'INSERT INTO `studentenhuis`(Naam, Adres) VALUES (?,?)',
+        values: [naam, adres],
         timeout: 2000
     }
 
