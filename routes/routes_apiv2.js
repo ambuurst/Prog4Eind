@@ -8,7 +8,7 @@ const express = require('express');
 const router = express.Router();
 const auth =  require('../auth/authentication');
 const users = require('../datasource/user_ds');
-const db = require('../datasource/intel');
+const db = require('../db/mysql-connector');
 
 //
 // Catch all except login
@@ -70,23 +70,18 @@ router.route('/login')
 //
 // Sample ENDPOINT
 //
-router.get('/intel/:year?', function(req, res, next) {
+router.get('/intel', function(req, res, next) {
 
-    const year = req.params.year || '';
-    let result = [];
-
-    if( year ) {
-        console.log('year')
-
-        result = db.filter( function(item) {
-            return ( item.info.year == year );
-        })
-    } else {
-        result = db;
-    }
-
-    res.json(result);
+    db.query('SELECT * FROM user', (error, rows, fields) => {
+        if (error) {
+            res.status(500).json(error.toString())
+        } else {
+            res.status(200).json(rows)
+        }
+    })
 });
+
+
 
 
 module.exports = router;
