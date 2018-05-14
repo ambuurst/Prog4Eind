@@ -100,7 +100,7 @@ router.post('/studentenhuis', (req, res, next) => {
 
 router.get('/studentenhuis', function(req, res, next) {
 
-    db.query('SELECT * FROM studentenhuis', (error, rows, fields) => {
+    db.query('SELECT * FROM view_studentenhuis', (error, rows, fields) => {
         if (error) {
             res.status(500).json(error.toString())
         } else {
@@ -113,7 +113,7 @@ router.get('/studentenhuis/:huisId?', function(req, res, next) {
 
     const huisId = req.params.huisId || '';
 
-    db.query('SELECT * FROM studentenhuis WHERE ID = ?', [huisId], (error, rows, fields) => {
+    db.query('SELECT * FROM view_studentenhuis WHERE ID = ?', [huisId], (error, rows, fields) => {
         if (error) {
             res.status(500).json(error.toString())
         } else {
@@ -141,6 +141,20 @@ router.get('/studentenhuis/:huisId?/maaltijd/:maaltijdId?', function(req, res, n
     const maaltijdId = req.params.maaltijdId || '';
 
     db.query('SELECT ID, Naam, Beschrijving, Ingredienten, Allergie, Prijs FROM maaltijd WHERE StudentenhuisID = ? AND ID =?', [huisId, maaltijdId], (error, rows, fields) => {
+        if (error) {
+            res.status(500).json(error.toString())
+        } else {
+            res.status(200).json(rows)
+        }
+    })
+});
+
+router.get('/studentenhuis/:huisId?/maaltijd/:maaltijdId?/deelnemers', function(req, res, next) {
+
+    const huisId = req.params.huisId || '';
+    const maaltijdId = req.params.maaltijdId || '';
+
+    db.query('SELECT Voornaam, Achternaam, Email FROM view_deelnemers WHERE StudentenhuisID = ? AND MaaltijdID =?', [huisId, maaltijdId], (error, rows, fields) => {
         if (error) {
             res.status(500).json(error.toString())
         } else {
