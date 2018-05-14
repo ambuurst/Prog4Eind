@@ -40,6 +40,7 @@ db.query('SELECT Password FROM user', function (error, result, fields) {
 });
 
 
+
 user = [{
     username: "",
     password: ""

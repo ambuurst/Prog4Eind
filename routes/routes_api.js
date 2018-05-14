@@ -42,28 +42,53 @@ router.route('/login')
         //
         // Get body params or ''
         //
-        var username = req.body.username || '';
+        var email = req.body.email || '';
         var password = req.body.password || '';
+
+        db.query('SELECT Password FROM user WHERE Email = ?', [email] , function (error, result, fields) {
+            if (error) {
+                res.status(500).json(error.toString())
+            } else {
+
+                var string = JSON.stringify(result)
+
+                var json = JSON.parse(string)
+
+                var x = json[0]
+
+                var Password = x["Password"]
+
+                if(Password === password){
+                    res.status(200).json({"token" : auth.encodeToken(email), "email" : email});
+                } else{
+                    res.status(401).json({"error":"Invalid credentials, bye"})
+                }
+
+                console.log(Password)
+
+            }
+        });
+
 
         //
         // Check in datasource for user & password combo.
         //
         //
-        result = users.filter(function (user) {
-            if( user.username === username && user.password === password) {
-                return ( user );
-            }
-        });
-
-        // Debug
-        console.log("result: " +  JSON.stringify(result[0]));
-
-        // Generate JWT
-        if( result[0] ) {
-            res.status(200).json({"token" : auth.encodeToken(username), "username" : username});
-        } else {
-            res.status(401).json({"error":"Invalid credentials, bye"})
-        }
+        // result = users.filter(function (user) {
+        //     if( user.username === username && user.password === password) {
+        //         return ( user );
+        //     }
+        // });
+        //
+        // // Debug
+        // console.log("result: " +  JSON.stringify(result[0]));
+        //
+        // // Generate JWT
+        // if( result[0] ) {
+        //     res.status(200).json({"token" : auth.encodeToken(username), "username" : username});
+        // } else {
+        //     res.status(401).json({"error":"Invalid credentials, bye"})
+        // }
 
 });
 
