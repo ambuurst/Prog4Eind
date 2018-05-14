@@ -128,6 +128,25 @@ router.get('/studentenhuis/:huisId?', function(req, res, next) {
     })
 });
 
+router.put('/studentenhuis/:huisId?', function(req, res, next) {
+
+    const huisId = req.params.huisId || '';
+
+    db.query('SELECT * FROM view_studentenhuis WHERE ID = ?', [huisId], (error, rows, fields) => {
+        if (error) {
+            res.status(500).json(error.toString())
+        } else {
+            if (rows.length > 0) {
+                res.status(200).json(rows)
+            }
+
+            else{
+                res.status(500).json("Niet gevonden (huisId bestaat niet)")
+            }
+        }
+    })
+});
+
 router.get('/studentenhuis/:huisId?/maaltijd', function(req, res, next) {
 
     const huisId = req.params.huisId || '';
