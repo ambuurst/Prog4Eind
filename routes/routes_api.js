@@ -70,9 +70,9 @@ router.route('/login')
 //
 // Sample ENDPOINT
 //
-router.get('/intel', function(req, res, next) {
+router.get('/studentenhuis', function(req, res, next) {
 
-    db.query('SELECT * FROM user', (error, rows, fields) => {
+    db.query('SELECT * FROM studentenhuis', (error, rows, fields) => {
         if (error) {
             res.status(500).json(error.toString())
         } else {
