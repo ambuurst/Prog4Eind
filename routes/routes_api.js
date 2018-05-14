@@ -9,6 +9,7 @@ const router = express.Router();
 const auth =  require('../auth/authentication');
 const users = require('../datasource/user_ds');
 const db = require('../db/mysql-connector');
+const assert = require('assert');
 
 //
 // Catch all except login
@@ -70,6 +71,33 @@ router.route('/login')
 //
 // Sample ENDPOINT
 //
+
+router.post('/studentenhuis', (req, res, next) => {
+
+    let studentenhuis = req.body;
+
+    assert.equal(typeof (req.body.naam), 'string', "Argument 'naam' must be a string.");
+    assert.equal(typeof (req.body.adres), 'string', "Argument 'adres' must be a string.");
+    assert.equal(typeof (req.body.userId), 'string', "Argument 'userId' must be a string.");
+
+    const query = {
+        sql: 'INSERT INTO `studentenhuis`(Naam, Adres, UserID) VALUES (?,?,?)',
+        values: [studentenhuis.naam, studentenhuis.adres, studentenhuis.userId],
+        timeout: 2000
+    }
+
+    db.query(query, (error, rows, fields) => {
+        if (error) {
+            res.status(500).json(error.toString())
+        } else {
+            res.status(200).json(rows)
+        }
+    })
+
+});
+
+
+
 router.get('/studentenhuis', function(req, res, next) {
 
     db.query('SELECT * FROM studentenhuis', (error, rows, fields) => {
@@ -86,6 +114,33 @@ router.get('/studentenhuis/:huisId?', function(req, res, next) {
     const huisId = req.params.huisId || '';
 
     db.query('SELECT * FROM studentenhuis WHERE ID = ?', [huisId], (error, rows, fields) => {
+        if (error) {
+            res.status(500).json(error.toString())
+        } else {
+            res.status(200).json(rows)
+        }
+    })
+});
+
+router.get('/studentenhuis/:huisId?/maaltijd', function(req, res, next) {
+
+    const huisId = req.params.huisId || '';
+
+    db.query('SELECT ID, Naam, Beschrijving, Ingredienten, Allergie, Prijs FROM maaltijd WHERE ID = ?', [huisId], (error, rows, fields) => {
+        if (error) {
+            res.status(500).json(error.toString())
+        } else {
+            res.status(200).json(rows)
+        }
+    })
+});
+
+router.get('/studentenhuis/:huisId?/maaltijd/:maaltijdId?', function(req, res, next) {
+
+    const huisId = req.params.huisId || '';
+    const maaltijdId = req.params.maaltijdId || '';
+
+    db.query('SELECT ID, Naam, Beschrijving, Ingredienten, Allergie, Prijs FROM maaltijd WHERE StudentenhuisID = ? AND ID =?', [huisId, maaltijdId], (error, rows, fields) => {
         if (error) {
             res.status(500).json(error.toString())
         } else {
