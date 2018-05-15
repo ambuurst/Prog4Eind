@@ -79,6 +79,7 @@ router.route('/register')
         var email = req.body.email;
         var password = req.body.password;
 
+
         const query = {
             sql: 'INSERT INTO `user`(Voornaam, Achternaam, Email, Password) VALUES (?,?,?,?)',
             values: [username, lastname, email, password],
@@ -408,7 +409,6 @@ router.put('/studentenhuis/:huisId?/maaltijd/:maaltijdId?', function(req, res, n
     var email;
     var UserId;
 
-    console.log(naam)
 
     var token = (req.header('X-Access-Token')) || '';
 
@@ -448,7 +448,7 @@ router.put('/studentenhuis/:huisId?/maaltijd/:maaltijdId?', function(req, res, n
 
                  else if (rows.affectedRows == 0) {
                      res.status(500).json("Niet gevonden (huisId bestaat niet of geen toegang)")
-                     console.log(rows)
+
                  }
 
                 else if (error) {
