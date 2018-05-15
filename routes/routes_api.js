@@ -1,8 +1,4 @@
-/**
- * Created by dkroeske on 28/04/2017.
- */
 
-// API - versie 2
 const express = require('express');
 const router = express.Router();
 const auth =  require('../auth/authentication');
@@ -33,7 +29,7 @@ router.all( new RegExp("[^(\/login)]"), function (req, res, next) {
 
 
 //
-// Login with {"username":"<username>", "password":"<password>"}
+// Login with {"email":"<email>", "password":"<password>"}
 //
 router.route('/login')
 
@@ -97,13 +93,6 @@ router.route('/register')
         })
 
     });
-
-
-
-//
-// Sample ENDPOINT
-//
-
 
 
 router.post('/studentenhuis', (req, res, next) => {
