@@ -398,54 +398,72 @@ router.delete('/studentenhuis/:huisId?/maaltijd/:maaltijdId?', function(req, res
     })
 })
 
-router.post('/studentenhuis/:huisId?/maaltijd/:maaltijdId?/deelnemers', function(req, res, next){
+router.post('/studentenhuis/:huisId?/maaltijd/:maaltijdId?/deelnemers', function(req, res, next) {
     var voornaam = req.body.voornaam;
     var achternaam = req.body.achternaam;
     var email = req.body.email;
     var huisId = req.params.huisId;
     var maaltijdId = req.params.maaltijdId;
+    var Email;
+    var UserId;
 
-    db.query('SELECT ID FROM user WHERE Email = "' + email + '"', (error, rows, fields) => {
+
+    var token = (req.header('X-Access-Token')) || '';
+
+    auth.decodeToken(token, (err, payload) => {
+
+        var string = JSON.stringify(payload)
+
+        var json = JSON.parse(string)
+
+        Email = json.sub;
+
+
+    });
+
+    db.query('SELECT ID FROM user WHERE Email = "' + Email + '"', (error, rows, fields) => {
         if (error) {
             res.status(500).json(error.toString())
         } else {
+            res.status(200)
+            var string = JSON.stringify(rows)
 
-            console.log(rows)
-            // res.status(200);
-            // var string = JSON.stringify(rows);
-            // console.log(string)
-            // var json = JSON.parse(string);
+            var json = JSON.parse(string)
 
-            // var x = json[0];
+            var x = json[0]
 
-            // var UserId = x["ID"];
+            UserId = x["ID"]
 
-            // db.query('INSERT INTO `deelnemers` (UserID, StudentenhuisID, MaaltijdID) VALUES (?,?,?)', [UserId, huisId, maaltijdId])
+            db.query("SET FOREIGN_KEY_CHECKS = 0")
+            db.query('INSERT INTO deelnemers (UserID, StudentenhuisID, MaaltijdID) VALUES (?,?,?)', [UserId, huisId, maaltijdId])
+            {
 
+                if (huisId == '' || maaltijdId == '') {
+                    res.status(500).json("Vul een HuisId en maaltijdId in")
+                }
 
+                else if (rows.affectedRows == 0) {
+                    res.status(500).json("Niet gevonden (huisId of maaltijdId bestaat niet of geen toegang)")
+                }
 
-            // db.query('SELECT StudentenhuisID, MaaltijdID FROM `view_deelnemers` WHERE Email = "' + email + '"', (error, rows, fields) =>{
-            //     if(error){
-            //         res.status(500).json(error.toString())       
-            //     }
-            // })
+                else if (error) {
+                    res.status(500).json(error.toString())
 
-            //
-            // db.query('SELECT StudentenhuisID FROM `view_deelnemers` WHERE Email = "' + email + '"', (error, rows, fields) =>{
-            //     if(error){
-            //         res.status(500).json(error.toString())
-            //     } else {
-            //         res.status(200)
-            //         var string = JSON.stringify(rows)
-            //
-            //         var json = JSON.parse(string)
-            //
-            //         var x = json[0]
-            //
-            //         var StudentenhuisID = x["StudentenhuisID"]
+                } else {
+
+                    res.status(200).json("Post gelukt")
+                }
+            }
         }
     })
 })
+
+
+
+
+
+
+
 
 router.delete('/studentenhuis/:huisId?/maaltijd/:maaltijdId?/deelnemers', function(req, res, next) {
 
