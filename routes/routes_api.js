@@ -258,6 +258,8 @@ router.post('/studentenhuis/:huisId?/maaltijd', function (req, res, next) {
     console.log(email)
 
     db.query('SELECT ID FROM user WHERE Email = "' + email + '"', (error, rows, fields) => {
+
+
         if (error) {
             res.status(500).json(error.toString())
         } else {
@@ -277,6 +279,7 @@ router.post('/studentenhuis/:huisId?/maaltijd', function (req, res, next) {
                     res.status(500).json(error.toString())
                 } else {
                     res.status(200).json(rows)
+                    console.log(rows)
                 }
 
             });
@@ -372,7 +375,7 @@ router.put('/studentenhuis/:huisId?/maaltijd/:maaltijdId?', function(req, res, n
             db.query(query, (error, rows, fields) => {
               if (rows.affectedRows == 0) {
                     res.status(404).json("Niet gevonden (huisId bestaat niet of geen toegang)");
-                    console.log(rows)
+
                 }
 
                 else if (error) {
@@ -479,26 +482,43 @@ router.post('/studentenhuis/:huisId?/maaltijd/:maaltijdId?/deelnemers', function
 
             UserId = x["ID"]
 
-            db.query("SET FOREIGN_KEY_CHECKS = 0")
-            db.query('INSERT INTO deelnemers (UserID, StudentenhuisID, MaaltijdID) VALUES (?,?,?)', [UserId, huisId, maaltijdId])
-            {
+            //console.log(UserId)
 
-                if (huisId == '' || maaltijdId == '') {
-                    res.status(500).json("Vul een HuisId en maaltijdId in")
-                }
+            db.query('SELECT UserID FROM deelnemers WHERE UserID = ?', [UserId], (error, rows, fields) => {
+                console.log(rows.affectedRows)
 
-                else if (rows.affectedRows == 0) {
-                    res.status(404).json("Niet gevonden (huisId of maaltijdId bestaat niet of geen toegang)")
-                }
+                if (rows) {
 
-                else if (error) {
-                    res.status(500).json(error.toString())
+                    console.log('werkt')
 
+                    db.query("SET FOREIGN_KEY_CHECKS = 0")
+                    db.query('INSERT INTO deelnemers (UserID, StudentenhuisID, MaaltijdID) VALUES (?,?,?)', [UserId, huisId, maaltijdId])
+                    {
+
+
+                        if (huisId == '' || maaltijdId == '') {
+                            res.status(500).json("Vul een HuisId en maaltijdId in")
+                        }
+
+                        else if (rows.affectedRows == 0) {
+                            res.status(404).json("Niet gevonden (huisId of maaltijdId bestaat niet of geen toegang)")
+                        }
+
+                        else if (error) {
+                            res.status(500).json(error.toString())
+
+
+                        } else {
+
+                            res.status(200).json("Post gelukt")
+                        }
+                    }
                 } else {
-
-                    res.status(200).json("Post gelukt")
+                    res.status(409).json("Conflict (Gebruiker is al aangemeld)")
                 }
-            }
+            })
+
+
         }
     })
 })
