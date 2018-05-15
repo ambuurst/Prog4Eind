@@ -210,6 +210,22 @@ router.put('/studentenhuis/:huisId?', function(req, res, next) {
     })
 });
 
+router.delete('/studentenhuis/:huisId?', function(req, res, next) {
+
+    const huisId = req.params.huisId || '';
+
+    db.query("SET FOREIGN_KEY_CHECKS = 0")
+    db.query('DELETE FROM studentenhuis WHERE ID = ?', [huisId], (error, rows, fields) => {
+        if (error) {
+            res.status(500).json(error.toString())
+
+        } else {
+
+                res.status(500).json("Verwijdering gelukt")
+            }
+    })
+});
+
 router.get('/studentenhuis/:huisId?/maaltijd', function(req, res, next) {
 
     const huisId = req.params.huisId || '';
