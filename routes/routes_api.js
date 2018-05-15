@@ -225,6 +225,7 @@ router.post('/studentenhuis/:huisId?/maaltijd', function (req, res, next) {
     var ingredienten = req.body.ingredienten;
     var allergie = req.body.allergie;
     var prijs = req.body.prijs;
+    var huisId = req.params.huisId || '';
 
     console.log(naam);
     console.log(beschrijving);
@@ -258,32 +259,46 @@ router.post('/studentenhuis/:huisId?/maaltijd', function (req, res, next) {
 
             var UserId = x["ID"]
 
-            db.query('SELECT StudentenhuisID FROM `view_deelnemers` WHERE Email = "' + email + '"', (error, rows, fields) =>{
-                if(error){
+            db.query("SET FOREIGN_KEY_CHECKS = 0")
+
+            db.query('INSERT INTO `maaltijd` (Naam, Beschrijving, Ingredienten, Allergie, Prijs, UserID, StudentenhuisID) VALUES (?,?,?,?,?,?,?)', [naam, beschrijving, ingredienten, allergie, prijs, UserId, huisId ], (error, rows, fields) => {
+                if (error) {
                     res.status(500).json(error.toString())
                 } else {
-                    res.status(200)
-                    var string = JSON.stringify(rows)
-
-                    var json = JSON.parse(string)
-
-                    var x = json[0]
-
-                    var StudentenhuisID = x["StudentenhuisID"]
-
-                    db.query("SET FOREIGN_KEY_CHECKS = 0")
-
-                    db.query('INSERT INTO `maaltijd` (Naam, Beschrijving, Ingredienten, Allergie, Prijs, UserID, StudentenhuisID) VALUES (?,?,?,?,?,?,?)', [naam, beschrijving, ingredienten, allergie, prijs, UserId, StudentenhuisID ], (error, rows, fields) => {
-                        if (error) {
-                            res.status(500).json(error.toString())
-                        } else {
-                            res.status(200).json(rows)
-                        }
-
-                    });
-
+                    res.status(200).json(rows)
                 }
-            } )
+
+            });
+
+
+            //
+            // db.query('SELECT StudentenhuisID FROM `view_deelnemers` WHERE Email = "' + email + '"', (error, rows, fields) =>{
+                //         if(error){
+                //             res.status(500).json(error.toString())
+                //         } else {
+                //             res.status(200)
+                //             var string = JSON.stringify(rows)
+                //
+                //             var json = JSON.parse(string)
+                //
+                //             var x = json[0]
+                //
+                //             var StudentenhuisID = x["StudentenhuisID"]
+                //
+                //             db.query("SET FOREIGN_KEY_CHECKS = 0")
+                //
+                //             db.query('INSERT INTO `maaltijd` (Naam, Beschrijving, Ingredienten, Allergie, Prijs, UserID, StudentenhuisID) VALUES (?,?,?,?,?,?,?)', [naam, beschrijving, ingredienten, allergie, prijs, UserId, StudentenhuisID ], (error, rows, fields) => {
+                //                 if (error) {
+                //                     res.status(500).json(error.toString())
+                //                 } else {
+                //                     res.status(200).json(rows)
+                //                 }
+                //
+                //             });
+                //
+                //         }
+                //     } )
+                // }
         }
     })
 
@@ -308,6 +323,8 @@ router.get('/studentenhuis/:huisId?/maaltijd', function(req, res, next) {
         }
     })
 });
+
+
 
 router.get('/studentenhuis/:huisId?/maaltijd/:maaltijdId?', function(req, res, next) {
 
@@ -381,7 +398,54 @@ router.delete('/studentenhuis/:huisId?/maaltijd/:maaltijdId?', function(req, res
     })
 })
 
+router.post('/studentenhuis/:huisId?/maaltijd/:maaltijdId?/deelnemers', function(req, res, next){
+    var voornaam = req.body.voornaam;
+    var achternaam = req.body.achternaam;
+    var email = req.body.email;
+    var huisId = req.params.huisId;
+    var maaltijdId = req.params.maaltijdId;
 
+    db.query('SELECT ID FROM user WHERE Email = "' + email + '"', (error, rows, fields) => {
+        if (error) {
+            res.status(500).json(error.toString())
+        } else {
+
+            console.log(rows)
+            // res.status(200);
+            // var string = JSON.stringify(rows);
+            // console.log(string)
+            // var json = JSON.parse(string);
+
+            // var x = json[0];
+
+            // var UserId = x["ID"];
+
+            // db.query('INSERT INTO `deelnemers` (UserID, StudentenhuisID, MaaltijdID) VALUES (?,?,?)', [UserId, huisId, maaltijdId])
+
+
+
+            // db.query('SELECT StudentenhuisID, MaaltijdID FROM `view_deelnemers` WHERE Email = "' + email + '"', (error, rows, fields) =>{
+            //     if(error){
+            //         res.status(500).json(error.toString())       
+            //     }
+            // })
+
+            //
+            // db.query('SELECT StudentenhuisID FROM `view_deelnemers` WHERE Email = "' + email + '"', (error, rows, fields) =>{
+            //     if(error){
+            //         res.status(500).json(error.toString())
+            //     } else {
+            //         res.status(200)
+            //         var string = JSON.stringify(rows)
+            //
+            //         var json = JSON.parse(string)
+            //
+            //         var x = json[0]
+            //
+            //         var StudentenhuisID = x["StudentenhuisID"]
+        }
+    })
+})
 
 router.delete('/studentenhuis/:huisId?/maaltijd/:maaltijdId?/deelnemers', function(req, res, next) {
 
