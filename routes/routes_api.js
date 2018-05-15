@@ -44,7 +44,9 @@ router.route('/login')
         db.query('SELECT Password FROM user WHERE Email = ?', [email] , function (error, result, fields) {
             if (error) {
                 res.status(500).json(error.toString())
-            } else {
+            } else if(email == '' || password == '') {
+                res.status(412).json("Een van de velden kan niet leeg zijn.")
+            } else{
 
 
                 var string = JSON.stringify(result)
@@ -55,13 +57,15 @@ router.route('/login')
 
                 var Password = x["Password"]
 
+                // console.log(Password)
+
                 if(Password === password){
                     res.status(200).json({"token" : auth.encodeToken(email), "email" : email});
                 } else{
                     res.status(401).json({"error":"Invalid credentials, bye"})
                 }
 
-                // console.log(Password)
+                console.log(Password)
             }
         });
 
@@ -79,6 +83,9 @@ router.route('/register')
         var email = req.body.email;
         var password = req.body.password;
 
+        if(username == '' || lastname == '' || email == '' || password == ''){
+            res.status(412).json("Een van de velden kan niet leeg zijn.")
+        }else{
         const query = {
             sql: 'INSERT INTO `user`(Voornaam, Achternaam, Email, Password) VALUES (?,?,?,?)',
             values: [username, lastname, email, password],
@@ -93,7 +100,7 @@ router.route('/register')
             }
         })
 
-    });
+    }});
 
 
 router.post('/studentenhuis', (req, res, next) => {
@@ -103,6 +110,9 @@ router.post('/studentenhuis', (req, res, next) => {
     var email;
     var UserId;
 
+    if(naam == '' || adres == ''){
+        res.status(412).json("Een van de velden kan niet leeg zijn.")
+    } else{
 
     var token = (req.header('X-Access-Token')) || '';
 
@@ -139,7 +149,7 @@ router.post('/studentenhuis', (req, res, next) => {
             })
         }
     })
-});
+}});
 
 
 
@@ -169,7 +179,7 @@ router.get('/studentenhuis/:huisId?', function(req, res, next) {
             }
 
             else{
-                res.status(500).json("Niet gevonden (huisId bestaat niet)")
+                res.status(404).json("Niet gevonden (huisId bestaat niet)")
             }
         }
     })
@@ -177,7 +187,11 @@ router.get('/studentenhuis/:huisId?', function(req, res, next) {
 
 router.put('/studentenhuis/:huisId?', function(req, res, next) {
 
-    const huisId = req.params.huisId || '';
+    const huisId = req.params.huisId;
+
+    if(huisId == ''){
+        res.status(412).json("Een van de velden kan niet leeg zijn.")
+    } else{
 
     db.query('SELECT * FROM view_studentenhuis WHERE ID = ?', [huisId], (error, rows, fields) => {
         if (error) {
@@ -188,11 +202,11 @@ router.put('/studentenhuis/:huisId?', function(req, res, next) {
             }
 
             else{
-                res.status(500).json("Niet gevonden (huisId bestaat niet)")
+                res.status(404).json("Niet gevonden (huisId bestaat niet)")
             }
         }
     })
-});
+}});
 
 router.delete('/studentenhuis/:huisId?', function(req, res, next) {
 
@@ -202,11 +216,11 @@ router.delete('/studentenhuis/:huisId?', function(req, res, next) {
     db.query('DELETE FROM studentenhuis WHERE ID = ?', [huisId], (error, rows, fields) => {
 
         if (huisId == ''){
-            res.status(500).json("Vul een HuisId in")
+            res.status(412).json("Vul een HuisId in")
         }
 
         else if (rows.affectedRows == 0){
-            res.status(500).json("Niet gevonden (huisId bestaat niet)")
+            res.status(404).json("Niet gevonden (huisId bestaat niet)")
         }
 
         else if (error) {
@@ -227,12 +241,9 @@ router.post('/studentenhuis/:huisId?/maaltijd', function (req, res, next) {
     var prijs = req.body.prijs;
     var huisId = req.params.huisId || '';
 
-    console.log(naam);
-    console.log(beschrijving);
-    console.log(ingredienten);
-    console.log(allergie);
-    console.log(prijs);
-
+    if(naam == '' || beschrijving == '' || ingredienten == '' || allergie == '' || prijs == ''){
+        res.status(412).json("Een van de velden kan niet leeg zijn.")
+    } else {
 
     var token = (req.header('X-Access-Token')) || '';
 
@@ -269,42 +280,12 @@ router.post('/studentenhuis/:huisId?/maaltijd', function (req, res, next) {
                 }
 
             });
-
-
-            //
-            // db.query('SELECT StudentenhuisID FROM `view_deelnemers` WHERE Email = "' + email + '"', (error, rows, fields) =>{
-                //         if(error){
-                //             res.status(500).json(error.toString())
-                //         } else {
-                //             res.status(200)
-                //             var string = JSON.stringify(rows)
-                //
-                //             var json = JSON.parse(string)
-                //
-                //             var x = json[0]
-                //
-                //             var StudentenhuisID = x["StudentenhuisID"]
-                //
-                //             db.query("SET FOREIGN_KEY_CHECKS = 0")
-                //
-                //             db.query('INSERT INTO `maaltijd` (Naam, Beschrijving, Ingredienten, Allergie, Prijs, UserID, StudentenhuisID) VALUES (?,?,?,?,?,?,?)', [naam, beschrijving, ingredienten, allergie, prijs, UserId, StudentenhuisID ], (error, rows, fields) => {
-                //                 if (error) {
-                //                     res.status(500).json(error.toString())
-                //                 } else {
-                //                     res.status(200).json(rows)
-                //                 }
-                //
-                //             });
-                //
-                //         }
-                //     } )
-                // }
         }
     })
 
 
 
-})
+}});
 
 router.get('/studentenhuis/:huisId?/maaltijd', function(req, res, next) {
     const huisId = req.params.huisId || '';
@@ -318,7 +299,7 @@ router.get('/studentenhuis/:huisId?/maaltijd', function(req, res, next) {
             }
 
             else{
-                res.status(500).json("Niet gevonden (huisId bestaat niet)")
+                res.status(404).json("Niet gevonden (huisId bestaat niet)")
             }
         }
     })
@@ -383,7 +364,7 @@ router.delete('/studentenhuis/:huisId?/maaltijd/:maaltijdId?', function(req, res
                 }
 
                 else if (rows.affectedRows == 0) {
-                    res.status(500).json("Niet gevonden (huisId of maaltijdId bestaat niet of geen toegang)")
+                    res.status(404).json("Niet gevonden (huisId of maaltijdId bestaat niet of geen toegang)")
                 }
 
                 else if (error) {
@@ -399,9 +380,6 @@ router.delete('/studentenhuis/:huisId?/maaltijd/:maaltijdId?', function(req, res
 })
 
 router.post('/studentenhuis/:huisId?/maaltijd/:maaltijdId?/deelnemers', function(req, res, next) {
-    var voornaam = req.body.voornaam;
-    var achternaam = req.body.achternaam;
-    var email = req.body.email;
     var huisId = req.params.huisId;
     var maaltijdId = req.params.maaltijdId;
     var Email;
@@ -443,7 +421,7 @@ router.post('/studentenhuis/:huisId?/maaltijd/:maaltijdId?/deelnemers', function
                 }
 
                 else if (rows.affectedRows == 0) {
-                    res.status(500).json("Niet gevonden (huisId of maaltijdId bestaat niet of geen toegang)")
+                    res.status(404).json("Niet gevonden (huisId of maaltijdId bestaat niet of geen toegang)")
                 }
 
                 else if (error) {
@@ -508,7 +486,7 @@ router.delete('/studentenhuis/:huisId?/maaltijd/:maaltijdId?/deelnemers', functi
                 }
 
                  else if (rows.affectedRows == 0) {
-                     res.status(500).json("Niet gevonden (huisId of maaltijdId bestaat niet of geen toegang)")
+                     res.status(404).json("Niet gevonden (huisId of maaltijdId bestaat niet of geen toegang)")
                  }
 
                 else if (error) {
@@ -537,7 +515,7 @@ router.get('/studentenhuis/:huisId?/maaltijd/:maaltijdId?/deelnemers', function(
             }
 
             else{
-                res.status(500).json("Niet gevonden (huisId of maaltijdId bestaat niet)")
+                res.status(404).json("Niet gevonden (huisId of maaltijdId bestaat niet)")
             }
 
 
