@@ -99,7 +99,8 @@ router.post('/studentenhuis', (req, res, next) => {
 
     var naam = req.body.naam;
     var adres = req.body.adres;
-    var email = 0;
+    var email;
+    var UserId;
 
 
     var token = (req.header('X-Access-Token')) || '';
@@ -126,32 +127,29 @@ router.post('/studentenhuis', (req, res, next) => {
     //     }
     // });
 
-    // const query1 = {
-    //     sql: 'SELECT UserID FROM User WHERE Email = ' + email,
-    // }
-    //
-    // db.query(query1, (error, rows, fields) => {
-    //     if (error) {
-    //         res.status(500).json(error.toString())
-    //     } else {
-    //         res.status(200).json(rows)
-    //     }
-    // })
-
-
-
-
-    const query = {
-        sql: 'INSERT INTO `studentenhuis`(Naam, Adres, UserID) VALUES (?,?,?)',
-        values: [naam, adres, userid],
-        timeout: 2000
-    }
-
-    db.query(query, (error, rows, fields) => {
+    db.query('SELECT ID FROM user WHERE Email = "' + email + '"', (error, rows, fields) => {
         if (error) {
             res.status(500).json(error.toString())
         } else {
             res.status(200).json(rows)
+            var string = JSON.stringify(rows)
+
+            var json = JSON.parse(string)
+
+            var x = json[0]
+
+            UserId = x["ID"]
+            console.log(UserId)
+
+        }
+    })
+
+
+    db.query('INSERT INTO `studentenhuis`(Naam, Adres, UserID) VALUES (' + naam + ', ' + adres + ', ' + UserId + ')', (error, rows, fields) => {
+        if (error) {
+            res.status(500).json(error.toString())
+        } else {
+            res.status(200).json("test")
         }
     })
 
