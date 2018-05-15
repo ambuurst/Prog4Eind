@@ -46,6 +46,7 @@ router.route('/login')
                 res.status(500).json(error.toString())
             } else {
 
+
                 var string = JSON.stringify(result)
 
                 var json = JSON.parse(string)
@@ -218,8 +219,79 @@ router.delete('/studentenhuis/:huisId?', function(req, res, next) {
     })
 });
 
-router.get('/studentenhuis/:huisId?/maaltijd', function(req, res, next) {
+router.post('/studentenhuis/:huisId?/maaltijd', function (req, res, next) {
+    var naam = req.body.naam;
+    var beschrijving = req.body.beschrijving;
+    var ingredienten = req.body.ingredienten;
+    var allergie = req.body.allergie;
+    var prijs = req.body.prijs;
 
+    console.log(naam);
+    console.log(beschrijving);
+    console.log(ingredienten);
+    console.log(allergie);
+    console.log(prijs);
+
+
+    var token = (req.header('X-Access-Token')) || '';
+
+    auth.decodeToken(token, (err, payload) => {
+
+        var string = JSON.stringify(payload)
+
+        var json = JSON.parse(string)
+
+        email = json.sub;
+    });
+    console.log(email)
+
+    db.query('SELECT ID FROM user WHERE Email = "' + email + '"', (error, rows, fields) => {
+        if (error) {
+            res.status(500).json(error.toString())
+        } else {
+            res.status(200)
+            var string = JSON.stringify(rows)
+
+            var json = JSON.parse(string)
+
+            var x = json[0]
+
+            var UserId = x["ID"]
+
+            db.query('SELECT StudentenhuisID FROM `view_deelnemers` WHERE Email = "' + email + '"', (error, rows, fields) =>{
+                if(error){
+                    res.status(500).json(error.toString())
+                } else {
+                    res.status(200)
+                    var string = JSON.stringify(rows)
+
+                    var json = JSON.parse(string)
+
+                    var x = json[0]
+
+                    var StudentenhuisID = x["StudentenhuisID"]
+
+                    db.query("SET FOREIGN_KEY_CHECKS = 0")
+
+                    db.query('INSERT INTO `maaltijd` (Naam, Beschrijving, Ingredienten, Allergie, Prijs, UserID, StudentenhuisID) VALUES (?,?,?,?,?,?,?)', [naam, beschrijving, ingredienten, allergie, prijs, UserId, StudentenhuisID ], (error, rows, fields) => {
+                        if (error) {
+                            res.status(500).json(error.toString())
+                        } else {
+                            res.status(200).json(rows)
+                        }
+
+                    });
+
+                }
+            } )
+        }
+    })
+
+
+
+})
+
+router.get('/studentenhuis/:huisId?/maaltijd', function(req, res, next) {
     const huisId = req.params.huisId || '';
 
     db.query('SELECT ID, Naam, Beschrijving, Ingredienten, Allergie, Prijs FROM maaltijd WHERE ID = ?', [huisId], (error, rows, fields) => {
