@@ -57,7 +57,7 @@ router.route('/login')
 
                 var Password = x["Password"]
 
-                // console.log(Password)
+                console.log(Password)
 
                 if(Password === password){
                     res.status(200).json({"token" : auth.encodeToken(email), "email" : email});
@@ -281,7 +281,6 @@ router.post('/studentenhuis/:huisId?/maaltijd', function (req, res, next) {
                     res.status(200).json(rows)
                     console.log(rows)
                 }
-
             });
         }
     })
@@ -381,10 +380,12 @@ router.put('/studentenhuis/:huisId?/maaltijd/:maaltijdId?', function(req, res, n
                 else if (error) {
                     res.status(500).json(error.toString())
 
-                } else {
+                } else if (db.query('SELECT UserID FROM maaltijd WHERE ID = "' + huisId + '"') == UserId) {
 
                     res.status(200).json("Toevoeging gelukt")
-                }
+                } else {
+                  res.status(409).json("Conflict, U mag deze data niet veranderen!")
+              }
 
             })
         }
