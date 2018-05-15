@@ -396,6 +396,74 @@ router.get('/studentenhuis/:huisId?/maaltijd/:maaltijdId?', function(req, res, n
     })
 });
 
+router.put('/studentenhuis/:huisId?/maaltijd/:maaltijdId?', function(req, res, next) {
+
+    const huisId = req.params.huisId || '';
+    const maaltijdId = req.params.maaltijdId || '';
+    const naam = req.body.naam || '';
+    const beschrijving = req.body.beschrijving || '';
+    const ingredienten = req.body.ingredienten || '';
+    const allergie = req.body.allergie || '';
+    const prijs = req.body.prijs || '';
+    var email;
+    var UserId;
+
+    console.log(naam)
+
+    var token = (req.header('X-Access-Token')) || '';
+
+    auth.decodeToken(token, (err, payload) => {
+
+        var string = JSON.stringify(payload)
+
+        var json = JSON.parse(string)
+
+        email = json.sub;
+
+
+    });
+
+    db.query('SELECT ID FROM user WHERE Email = "' + email + '"', (error, rows, fields) => {
+        if (error) {
+            res.status(500).json(error.toString())
+        } else {
+            res.status(200)
+            var string = JSON.stringify(rows)
+
+            var json = JSON.parse(string)
+
+            var x = json[0]
+
+            UserId = x["ID"]
+
+            var query = {
+                sql: 'UPDATE `maaltijd` SET Naam = ?, Beschrijving = ?, Ingredienten = ?, Allergie = ?, Prijs = ?  WHERE ID = ? AND UserID = ? AND StudentenhuisID = ?',
+                values: [naam, beschrijving, ingredienten, allergie, prijs, maaltijdId, UserId, huisId],
+                timeout: 2000
+            }
+            db.query(query, (error, rows, fields) => {
+                 if (huisId == '') {
+                     res.status(500).json("Vul een HuisId in")
+                 }
+
+                 else if (rows.affectedRows == 0) {
+                     res.status(500).json("Niet gevonden (huisId bestaat niet of geen toegang)")
+                     console.log(rows)
+                 }
+
+                else if (error) {
+                    res.status(500).json(error.toString())
+
+                } else {
+
+                    res.status(200).json("Toevoeging gelukt")
+                }
+
+            })
+        }
+    })
+})
+
 router.delete('/studentenhuis/:huisId?/maaltijd/:maaltijdId?', function(req, res, next) {
 
     var huisId = req.params.huisId || '';
