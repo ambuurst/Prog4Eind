@@ -117,21 +117,11 @@ router.post('/studentenhuis', (req, res, next) => {
 
     });
 
-    // db.query('SELECT UserID FROM User WHERE Email = ?', [email], function (error, result, fields) {
-    //     if (error) {
-    //         res.status(500).json(error.toString())
-    //     } else {
-    //         console.log(result)
-    //         res.status(200).json(rows)
-    //
-    //     }
-    // });
-
     db.query('SELECT ID FROM user WHERE Email = "' + email + '"', (error, rows, fields) => {
         if (error) {
             res.status(500).json(error.toString())
         } else {
-            res.status(200).json(rows)
+            res.status(200)
             var string = JSON.stringify(rows)
 
             var json = JSON.parse(string)
@@ -139,20 +129,15 @@ router.post('/studentenhuis', (req, res, next) => {
             var x = json[0]
 
             UserId = x["ID"]
-            console.log(UserId)
-
+            db.query('INSERT INTO `studentenhuis`(Naam, Adres, UserID) VALUES (?, ?, ?)', [naam, adres, UserId], (error, rows, fields) => {
+                if (error) {
+                    res.status(500).json(error.toString())
+                } else {
+                    res.status(200).json(rows)
+                }
+            })
         }
     })
-
-
-    db.query('INSERT INTO `studentenhuis`(Naam, Adres, UserID) VALUES (' + naam + ', ' + adres + ', ' + UserId + ')', (error, rows, fields) => {
-        if (error) {
-            res.status(500).json(error.toString())
-        } else {
-            res.status(200).json("test")
-        }
-    })
-
 });
 
 
