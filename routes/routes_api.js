@@ -311,6 +311,63 @@ router.delete('/studentenhuis/:huisId?/maaltijd/:maaltijdId?', function(req, res
 
 
 
+router.delete('/studentenhuis/:huisId?/maaltijd/:maaltijdId?/deelnemers', function(req, res, next) {
+
+    const huisId = req.params.huisId || '';
+    const maaltijdId = req.params.maaltijdId || '';
+    var email;
+    var UserId;
+
+
+    var token = (req.header('X-Access-Token')) || '';
+
+    auth.decodeToken(token, (err, payload) => {
+
+        var string = JSON.stringify(payload)
+
+        var json = JSON.parse(string)
+
+        email = json.sub;
+
+
+    });
+
+    db.query('SELECT ID FROM user WHERE Email = "' + email + '"', (error, rows, fields) => {
+        if (error) {
+            res.status(500).json(error.toString())
+        } else {
+            res.status(200)
+            var string = JSON.stringify(rows)
+
+            var json = JSON.parse(string)
+
+            var x = json[0]
+
+            UserId = x["ID"]
+
+
+            db.query("SET FOREIGN_KEY_CHECKS = 0")
+            db.query('DELETE FROM deelnemers WHERE StudentenhuisID = ? AND MaaltijdID = ? AND UserID = ?', [huisId, maaltijdId, UserId], (error, rows, fields) => {
+                if (huisId == '' || maaltijdId == '') {
+                    res.status(500).json("Vul een HuisId en maaltijdId in")
+
+                }
+
+                 else if (rows.affectedRows == 0) {
+                     res.status(500).json("Niet gevonden (huisId of maaltijdId bestaat niet of geen toegang)")
+                 }
+
+                else if (error) {
+                    res.status(500).json(error.toString())
+
+                } else {
+                    res.status(200).json("Verwijdering gelukt")
+                }
+            })
+        }
+    })
+})
+
 router.get('/studentenhuis/:huisId?/maaltijd/:maaltijdId?/deelnemers', function(req, res, next) {
 
     const huisId = req.params.huisId || '';
