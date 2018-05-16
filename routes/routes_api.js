@@ -508,8 +508,9 @@ router.post('/studentenhuis/:huisId?/maaltijd/:maaltijdId?/deelnemers', function
 
         const json = JSON.parse(string);
 
-        Email = json.sub;
+        email = json.sub;
 
+        console.log(email)
 
     });
 
@@ -551,7 +552,16 @@ router.post('/studentenhuis/:huisId?/maaltijd/:maaltijdId?/deelnemers', function
 
                         } else {
                             console.log(rows)
-                            res.status(200).json("Post gelukt")
+                            db.query('SELECT Voornaam, Achternaam, Email FROM user WHERE ID = "' + UserId + '"', (error, rows, fields ) => {
+                                const string = JSON.stringify(rows);
+
+                                const json = JSON.parse(string);
+
+                                console.log(json)
+
+                                res.status(200).json(json)
+                            });
+
                         }
                     }
 
