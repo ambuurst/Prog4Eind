@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test-default": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha --reporter spec",
     "start": "node index.js"
   },
   "author": "",
@@ -12,10 +13,14 @@
   "dependencies": {
     "atob": "^2.1.1",
     "body-parser": "^1.18.2",
-    "chai": "^4.1.2",
+    "chai-http": "^4.0.0",
     "express": "^4.16.3",
     "jwt-simple": "^0.5.1",
     "moment": "^2.22.1",
-    "mysql": "^2.15.0"
+    "mysql": "^2.15.0",
+    "server": "^1.0.18"
+  },
+  "devDependencies": {
+    "chai": "^4.1.2"
   }
 }
