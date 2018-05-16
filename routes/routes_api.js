@@ -10,7 +10,7 @@ const db = require('../db/mysql-connector');
 //
 router.all( new RegExp("[^(\/login)]"), function (req, res, next) {
 
-    //
+
     console.log("VALIDATE TOKEN");
 
     const token = (req.header('X-Access-Token')) || '';
@@ -110,6 +110,7 @@ router.post('/studentenhuis', (req, res, next) => {
     let email;
     let UserId;
 
+    console.log(adres)
     if(naam === '' || adres === ''){
         res.status(412).json("Een van de velden kan niet leeg zijn.")
     } else{
@@ -140,11 +141,29 @@ router.post('/studentenhuis', (req, res, next) => {
             const x = json[0];
 
             UserId = x["ID"];
+
             db.query('INSERT INTO `studentenhuis`(Naam, Adres, UserID) VALUES (?, ?, ?)', [naam, adres, UserId], (error, rows, fields) => {
+                console.log(adres)
                 if (error) {
                     res.status(500).json(error.toString())
                 } else {
-                    res.status(200).json(rows)
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                    db.query('SELECT * FROM view_studentenhuis WHERE ID = "7"', (error, rows, fields) => {
+                        if(error){
+                            res.status(500).json(error.toString());
+                        } else {
+                            console.log(rows)
+
+                            const string = JSON.stringify(rows);
+
+                            const json = JSON.parse(string);
+
+                            const x = json[0];
+
+                            res.status(200).json(x)
+                        }
+                    })
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 }
             })
         }
@@ -175,7 +194,7 @@ router.get('/studentenhuis/:huisId?', function(req, res, next) {
             res.status(500).json(error.toString())
         } else {
             if (rows.length > 0) {
-                res.status(200).json(rows)
+                res.status(200).json()
             }
 
             else{
@@ -278,8 +297,12 @@ router.post('/studentenhuis/:huisId?/maaltijd', function (req, res, next) {
                 if (error) {
                     res.status(500).json(error.toString())
                 } else {
-                    res.status(200).json(rows);
-                    console.log(rows)
+                    db.query('SELECT ID, Naam, Beschrijving, Ingredienten, Allergie, Prijs FROM maaltijd WHERE Naam = "' + naam + '" AND Beschrijving = "' + beschrijving + '"', (error, rows, fields) =>
+                    {
+                        res.status(200).json(rows);
+                        console.log(rows)
+                    })
+
                 }
             });
         }
@@ -510,7 +533,7 @@ router.post('/studentenhuis/:huisId?/maaltijd/:maaltijdId?/deelnemers', function
 
 
                         } else {
-
+                            console.log(rows)
                             res.status(200).json("Post gelukt")
                         }
                     }
