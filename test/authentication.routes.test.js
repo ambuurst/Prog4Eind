@@ -14,99 +14,147 @@ let validToken
 
 describe('Registration', () => {
     it('should return a token when providing valid information', (done) => {
-        //
-        // Hier schrijf je jouw testcase.
-        //
+        chai.request(server)
+            .post('/api/register')
+            .send({"username" : "test",
+                    "lastname" : "test",
+                    "email" : "test",
+                    "password" : "test"})
+            .end((err, res) => {
 
-        // Tip: deze test levert een token op. Dat token gebruik je in 
+                res.should.have.status(200)
+                validToken = res.body.token
+
+
+                done()
+            });
+
+        // Tip: deze test levert een token op. Dat token gebruik je in
         // andere testcases voor beveiligde routes door het hier te exporteren
         // en in andere testcases te importeren via require.
-        // validToken = res.body.token
-        // module.exports = {
-        //     token: validToken
-        // }
-        done()
+
+         // validToken = res.body.token
+         // module.exports = {
+         //     token: validToken
+         // }
     })
 
-    it('should return an error on GET request', (done) => {
-        //
-        // Hier schrijf je jouw testcase.
-        //
-        done()
-    })
-
-    it('should throw an error when the user already exists', (done) => {
-        //
-        // Hier schrijf je jouw testcase.
-        //
-        done()
-    })
 
     it('should throw an error when no firstname is provided', (done) => {
-        //
-        // Hier schrijf je jouw testcase.
-        //
-        done()
+        chai.request(server)
+            .post('/api/register')
+            .set('Accept', 'application/json')
+            .send({"username" : "t",
+                "lastname" : "test",
+                "email" : "test",
+                "password" : "test"})
+            .end((err, res) => {
+
+                res.should.have.status(412)
+
+
+                done()
+            });
     })
 
     it('should throw an error when firstname is shorter than 2 chars', (done) => {
-        //
-        // Hier schrijf je jouw testcase.
-        //
-        done()
+        chai.request(server)
+            .post('/api/register')
+            .set('Accept', 'application/json')
+            .send({"username" : "",
+                "lastname" : "test",
+                "email" : "test",
+                "password" : "test"})
+            .end((err, res) => {
+
+                res.should.have.status(412)
+
+
+                done()
+            });
     })
 
     it('should throw an error when no lastname is provided', (done) => {
-        //
-        // Hier schrijf je jouw testcase.
-        //
-        done()
+        chai.request(server)
+            .post('/api/register')
+            .set('Accept', 'application/json')
+            .send({"username" : "test",
+                "lastname" : "",
+                "email" : "test",
+                "password" : "test"})
+            .end((err, res) => {
+
+                res.should.have.status(412)
+
+
+                done()
+            });
     })
 
     it('should throw an error when lastname is shorter than 2 chars', (done) => {
-        //
-        // Hier schrijf je jouw testcase.
-        //
-        done()
+        chai.request(server)
+            .post('/api/register')
+            .set('Accept', 'application/json')
+            .send({"username" : "test",
+                "lastname" : "t",
+                "email" : "test",
+                "password" : "test"})
+            .end((err, res) => {
+
+                res.should.have.status(412)
+
+
+                done()
+            });
     })
 
-    it('should throw an error when email is invalid', (done) => {
-        //
-        // Hier schrijf je jouw testcase.
-        //
-        done()
-    })
 
 })
 
 describe('Login', () => {
 
     it('should return a token when providing valid information', (done) => {
-        //
-        // Hier schrijf je jouw testcase.
-        //
-        done()
+        chai.request(server)
+            .post('/api/login')
+            .set('Accept', 'application/json')
+            .send({"email" : "test",
+                   "password" : "test"})
+            .end((err, res) => {
+
+                res.should.have.status(200)
+
+                done()
+            })
+
     })
 
     it('should throw an error when email does not exist', (done) => {
-        //
-        // Hier schrijf je jouw testcase.
-        //
-        done()
+        chai.request(server)
+            .post('/api/login')
+            .set('Accept', 'application/json')
+            .send({"email" : "tes",
+                "password" : "test"})
+            .end((err, res) => {
+
+                res.should.have.status(412)
+
+                done()
+            })
     })
 
     it('should throw an error when email exists but password is invalid', (done) => {
-        //
-        // Hier schrijf je jouw testcase.
-        //
-        done()
+        chai.request(server)
+            .post('/api/login')
+            .set('Accept', 'application/json')
+            .send({"email" : "test",
+                "password" : "tes"})
+            .end((err, res) => {
+
+                res.should.have.status(401)
+
+                done()
+            })
     })
 
-    it('should throw an error when using an invalid email', (done) => {
-        //
-        // Hier schrijf je jouw testcase.
-        //
-        done()
-    })
 
 })

@@ -6,7 +6,7 @@ const db = require('../db/mysql-connector');
 
 ////// Catch all except login //////
 
-router.all( new RegExp("[^(\/login)]"), function (req, res, next) {
+router.all( new RegExp("[^(\/login|\register)]"), function (req, res, next) {
 
     console.log("VALIDATE TOKEN");
 
@@ -37,9 +37,12 @@ router.route('/login')
             if (error) {
                 res.status(500).json(error.toString())
             } else if(email === '' || password === '') {
-                res.status(412).json({"message":"Een van de velden kan niet leeg zijn", "code":"412", "datetime":new Date().toLocaleString()})
+                res.status(412).json({"message":"Een of meer properties in de request body ontbreken of zijn foutief", "code":"412", "datetime":new Date().toLocaleString()})
+                
+                
+            } else if (result.length > 0) {
 
-            } else{
+                console.log(result)
 
                 const string = JSON.stringify(result);
 
@@ -54,10 +57,13 @@ router.route('/login')
                 if(Password === password){
                     res.status(200).json({"token" : auth.encodeToken(email), "email" : email});
                 } else{
-                    res.status(401).json({"message":"Niet geautoriseerd (geen valid token)", "code":"401", "datetime":new Date().toLocaleString()})
+                    res.status(401).json({"message":"Een of meer properties in de request body ontbreken of zijn foutief", "code":"401", "datetime":new Date().toLocaleString()})
                 }
 
                 console.log(Password)
+            }
+            else {
+                res.status(412).json({"message":"Een of meer properties in de request body ontbreken of zijn foutief", "code":"412", "datetime":new Date().toLocaleString()})
             }
         });
 });
@@ -77,9 +83,13 @@ router.route('/register')
         const password = req.body.password;
 
         if(username === '' || lastname === '' || email === '' || password === ''){
-            res.status(412).json({"message":"Een van de velden kan niet leeg zijn", "code":"412", "datetime":new Date().toLocaleString()})
+            res.status(412).json({"message":"Een of meer properties in de request body ontbreken of zijn foutief", "code":"412", "datetime":new Date().toLocaleString()})
 
-        }else{
+
+        }
+        else if (username.length < 2 || lastname.length < 2){
+            res.status(412).json({"message":"Een of meer properties in de request body ontbreken of zijn foutief", "code":"412", "datetime":new Date().toLocaleString()})
+        } else{
         const query = {
             sql: 'INSERT INTO `user`(Voornaam, Achternaam, Email, Password) VALUES (?,?,?,?)',
             values: [username, lastname, email, password],
@@ -113,6 +123,8 @@ router.post('/studentenhuis', (req, res, next) => {
 
     const token = (req.header('X-Access-Token')) || '';
 
+
+
     auth.decodeToken(token, (err, payload) => {
 
             const string = JSON.stringify(payload);
@@ -120,6 +132,8 @@ router.post('/studentenhuis', (req, res, next) => {
             const json = JSON.parse(string);
 
              email = json.sub;
+
+             console.log(email)
     });
 
     db.query('SELECT ID FROM user WHERE Email = "' + email + '"', (error, rows, fields) => {
@@ -136,30 +150,20 @@ router.post('/studentenhuis', (req, res, next) => {
             UserId = x["ID"];
 
             db.query('INSERT INTO `studentenhuis`(Naam, Adres, UserID) VALUES (?, ?, ?)', [naam, adres, UserId], (error, rows, fields) => {
-                console.log(adres)
+
                 if (error) {
                     res.status(500).json(error.toString())
                 } else {
-                    db.query('SELECT * FROM view_studentenhuis WHERE ID = "7"', (error, rows, fields) => {
-                        if(error){
-                            res.status(500).json(error.toString());
-                        } else {
-                            console.log(rows)
 
-                            const string = JSON.stringify(rows);
+                    res.status(200).json("toevoegen voltooid")
+                }
 
-                            const json = JSON.parse(string);
-
-                            const x = json[0];
-
-                            res.status(200).json(x)
-                        }
                     })
                 }
             })
         }
     })
-}});
+
 
 
 ////// Get api/studentenhuis //////
