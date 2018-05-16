@@ -569,46 +569,39 @@ router.post('/studentenhuis/:huisId?/maaltijd/:maaltijdId?/deelnemers', function
 
             //console.log(UserId)
 
-            db.query('SELECT UserID FROM deelnemers WHERE UserID = ?', [UserId], (error, rows, fields) => {
-                console.log(rows.affectedRows);
 
-                if (rows) {
+            db.query("SET FOREIGN_KEY_CHECKS = 0");
+            db.query('INSERT INTO deelnemers (UserID, StudentenhuisID, MaaltijdID) VALUES (?,?,?)', [UserId, huisId, maaltijdId]);
+            {
+                if (huisId === '' || maaltijdId === '') {
+                    res.status(500).json("Vul een HuisId en maaltijdId in")
+                }
 
-                    console.log('werkt');
+                else if (rows.affectedRows === 0) {
+                    res.status(404).json({
+                        "message": "Niet gevonden (huisId of maaltijdId bestaat niet)",
+                        "code": "404",
+                        "datetime": new Date().toLocaleString()
+                    })
+                }
 
-                    db.query("SET FOREIGN_KEY_CHECKS = 0");
-                    db.query('INSERT INTO deelnemers (UserID, StudentenhuisID, MaaltijdID) VALUES (?,?,?)', [UserId, huisId, maaltijdId]);
-                    {
-                        if (huisId === '' || maaltijdId === '') {
-                            res.status(500).json("Vul een HuisId en maaltijdId in")
-                        }
-
-                        else if (rows.affectedRows === 0) {
-                            res.status(404).json({"message":"Niet gevonden (huisId of maaltijdId bestaat niet)", "code":"404", "datetime":new Date().toLocaleString()})
-                        }
-
-                        else if (error) {
-                            res.status(500).json(error.toString())
-
-                        } else {
-                            console.log(rows)
-                            db.query('SELECT Voornaam, Achternaam, Email FROM user WHERE ID = "' + UserId + '"', (error, rows, fields ) => {
-                                const string = JSON.stringify(rows);
-
-                                const json = JSON.parse(string);
-
-                                console.log(json)
-
-                                res.status(200).json(json)
-                            });
-
-                        }
-                    }
+                else if (error) {
+                    res.status(500).json(error.toString())
 
                 } else {
-                    res.status(409).json({"message":"Gebruiker is al aangemeld", "code":"409", "datetime":new Date().toLocaleString()})
+
+                    db.query('SELECT Voornaam, Achternaam, Email FROM user WHERE ID = "' + UserId + '"', (error, rows, fields) => {
+                        const string = JSON.stringify(rows);
+
+                        const json = JSON.parse(string);
+
+
+                        res.status(200).json(json)
+                    });
+
                 }
-            })
+            }
+
         }
     })
 });
