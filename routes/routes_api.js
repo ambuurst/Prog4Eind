@@ -4,10 +4,8 @@ const router = express.Router();
 const auth =  require('../auth/authentication');
 const db = require('../db/mysql-connector');
 
+////// Catch all except login //////
 
-//
-// Catch all except login
-//
 router.all( new RegExp("[^(\/login)]"), function (req, res, next) {
 
     console.log("VALIDATE TOKEN");
@@ -26,17 +24,12 @@ router.all( new RegExp("[^(\/login)]"), function (req, res, next) {
 });
 
 
+////// Login with {"email":"<email>", "password":"<password>"} //////
 
-//
-// Login with {"email":"<email>", "password":"<password>"}
-//
 router.route('/login')
 
     .post( function(req, res) {
 
-        //
-        // Get body params or ''
-        //
         const email = req.body.email || '';
         const password = req.body.password || '';
 
@@ -69,6 +62,8 @@ router.route('/login')
         });
 });
 
+ ////// Register //////
+
 router.route('/register')
 
     .post( function(req, res) {
@@ -100,6 +95,8 @@ router.route('/register')
         })
     }});
 
+
+////// Post api/studentenhuis //////
 
 router.post('/studentenhuis', (req, res, next) => {
 
@@ -165,6 +162,7 @@ router.post('/studentenhuis', (req, res, next) => {
 }});
 
 
+////// Get api/studentenhuis //////
 
 router.get('/studentenhuis', function(req, res, next) {
 
@@ -177,6 +175,8 @@ router.get('/studentenhuis', function(req, res, next) {
 
     })
 });
+
+////// Get api/studentenhuis/{huisId} //////
 
 router.get('/studentenhuis/:huisId?', function(req, res, next) {
 
@@ -197,6 +197,8 @@ router.get('/studentenhuis/:huisId?', function(req, res, next) {
         }
     })
 });
+
+////// Put api/studentenhuis/{huisId} //////
 
 router.put('/studentenhuis/:huisId?', function(req, res, next) {
 
@@ -221,6 +223,8 @@ router.put('/studentenhuis/:huisId?', function(req, res, next) {
     })
 }});
 
+////// Delete api/studentenhuis/{huisId} //////
+
 router.delete('/studentenhuis/:huisId?', function(req, res, next) {
 
     const huisId = req.params.huisId || '';
@@ -244,6 +248,8 @@ router.delete('/studentenhuis/:huisId?', function(req, res, next) {
             }
     })
 });
+
+////// Post api/studentenhuis/{huisId}/maaltijd //////
 
 router.post('/studentenhuis/:huisId?/maaltijd', function (req, res, next) {
     const naam = req.body.naam;
@@ -307,6 +313,8 @@ router.post('/studentenhuis/:huisId?/maaltijd', function (req, res, next) {
 
 }});
 
+////// Get api/studentenhuis/{huisId}/maaltijd //////
+
 router.get('/studentenhuis/:huisId?/maaltijd', function(req, res, next) {
     const huisId = req.params.huisId || '';
 
@@ -328,7 +336,7 @@ router.get('/studentenhuis/:huisId?/maaltijd', function(req, res, next) {
     })
 });
 
-
+////// Get api/studentenhuis/{huisId}/maaltijd/{maaltijdId} //////
 
 router.get('/studentenhuis/:huisId?/maaltijd/:maaltijdId?', function(req, res, next) {
 
@@ -343,6 +351,8 @@ router.get('/studentenhuis/:huisId?/maaltijd/:maaltijdId?', function(req, res, n
         }
     })
 });
+
+////// Put api/studentenhuis/{huisId}/maaltijd/{maaltijdId} //////
 
 router.put('/studentenhuis/:huisId?/maaltijd/:maaltijdId?', function(req, res, next) {
 
@@ -415,6 +425,8 @@ router.put('/studentenhuis/:huisId?/maaltijd/:maaltijdId?', function(req, res, n
     })
 }});
 
+////// Delete api/studentenhuis/{huisId}/maaltijd/{maaltijdId} //////
+
 router.delete('/studentenhuis/:huisId?/maaltijd/:maaltijdId?', function(req, res, next) {
 
     const huisId = req.params.huisId || '';
@@ -474,6 +486,8 @@ router.delete('/studentenhuis/:huisId?/maaltijd/:maaltijdId?', function(req, res
         }
     })
 });
+
+////// Post api/studentenhuis/{huisId}/maaltijd/{maaltijdId}/deelnemers //////
 
 router.post('/studentenhuis/:huisId?/maaltijd/:maaltijdId?/deelnemers', function(req, res, next) {
     const huisId = req.params.huisId;
@@ -545,6 +559,8 @@ router.post('/studentenhuis/:huisId?/maaltijd/:maaltijdId?/deelnemers', function
     })
 });
 
+////// Delete api/studentenhuis/{huisId}/maaltijd/{maaltijdId}/deelnemers //////
+
 router.delete('/studentenhuis/:huisId?/maaltijd/:maaltijdId?/deelnemers', function(req, res, next) {
 
     const huisId = req.params.huisId || '';
@@ -597,6 +613,8 @@ router.delete('/studentenhuis/:huisId?/maaltijd/:maaltijdId?/deelnemers', functi
         }
     })
 });
+
+////// Get api/studentenhuis/{huisId}/maaltijd/{maaltijdId}/deelnemers //////
 
 router.get('/studentenhuis/:huisId?/maaltijd/:maaltijdId?/deelnemers', function(req, res, next) {
 
