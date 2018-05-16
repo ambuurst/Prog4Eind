@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 const auth =  require('../auth/authentication');
 const db = require('../db/mysql-connector');
-const assert = require('assert');
+
 
 //
 // Catch all except login
@@ -11,9 +11,9 @@ const assert = require('assert');
 router.all( new RegExp("[^(\/login)]"), function (req, res, next) {
 
     //
-    console.log("VALIDATE TOKEN")
+    console.log("VALIDATE TOKEN");
 
-    var token = (req.header('X-Access-Token')) || '';
+    const token = (req.header('X-Access-Token')) || '';
 
     auth.decodeToken(token, (err, payload) => {
         if (err) {
@@ -38,26 +38,26 @@ router.route('/login')
         //
         // Get body params or ''
         //
-        var email = req.body.email || '';
-        var password = req.body.password || '';
+        const email = req.body.email || '';
+        const password = req.body.password || '';
 
         db.query('SELECT Password FROM user WHERE Email = ?', [email] , function (error, result, fields) {
             if (error) {
                 res.status(500).json(error.toString())
-            } else if(email == '' || password == '') {
+            } else if(email === '' || password === '') {
                 res.status(412).json("Een van de velden kan niet leeg zijn.")
             } else{
 
 
-                var string = JSON.stringify(result)
+                const string = JSON.stringify(result);
 
-                var json = JSON.parse(string)
+                const json = JSON.parse(string);
 
-                var x = json[0]
+                const x = json[0];
 
-                var Password = x["Password"]
+                const Password = x["Password"];
 
-                console.log(Password)
+                console.log(Password);
 
                 if(Password === password){
                     res.status(200).json({"token" : auth.encodeToken(email), "email" : email});
@@ -78,19 +78,19 @@ router.route('/register')
         //
         // Get body params or ''
         //
-        var username = req.body.username;
-        var lastname = req.body.lastname;
-        var email = req.body.email;
-        var password = req.body.password;
+        const username = req.body.username;
+        const lastname = req.body.lastname;
+        const email = req.body.email;
+        const password = req.body.password;
 
-        if(username == '' || lastname == '' || email == '' || password == ''){
+        if(username === '' || lastname === '' || email === '' || password === ''){
             res.status(412).json("Een van de velden kan niet leeg zijn.")
         }else{
         const query = {
             sql: 'INSERT INTO `user`(Voornaam, Achternaam, Email, Password) VALUES (?,?,?,?)',
             values: [username, lastname, email, password],
             timeout: 2000
-        }
+        };
 
         db.query( query, (error, rows, fields) => {
             if (error) {
@@ -105,22 +105,22 @@ router.route('/register')
 
 router.post('/studentenhuis', (req, res, next) => {
 
-    var naam = req.body.naam;
-    var adres = req.body.adres;
-    var email;
-    var UserId;
+    const naam = req.body.naam;
+    const adres = req.body.adres;
+    let email;
+    let UserId;
 
-    if(naam == '' || adres == ''){
+    if(naam === '' || adres === ''){
         res.status(412).json("Een van de velden kan niet leeg zijn.")
     } else{
 
-    var token = (req.header('X-Access-Token')) || '';
+    const token = (req.header('X-Access-Token')) || '';
 
     auth.decodeToken(token, (err, payload) => {
 
-            var string = JSON.stringify(payload)
+            const string = JSON.stringify(payload);
 
-            var json = JSON.parse(string)
+            const json = JSON.parse(string);
 
              email = json.sub;
 
@@ -132,14 +132,14 @@ router.post('/studentenhuis', (req, res, next) => {
         if (error) {
             res.status(500).json(error.toString())
         } else {
-            res.status(200)
-            var string = JSON.stringify(rows)
+            res.status(200);
+            const string = JSON.stringify(rows);
 
-            var json = JSON.parse(string)
+            const json = JSON.parse(string);
 
-            var x = json[0]
+            const x = json[0];
 
-            UserId = x["ID"]
+            UserId = x["ID"];
             db.query('INSERT INTO `studentenhuis`(Naam, Adres, UserID) VALUES (?, ?, ?)', [naam, adres, UserId], (error, rows, fields) => {
                 if (error) {
                     res.status(500).json(error.toString())
@@ -189,7 +189,7 @@ router.put('/studentenhuis/:huisId?', function(req, res, next) {
 
     const huisId = req.params.huisId;
 
-    if(huisId == ''){
+    if(huisId === ''){
         res.status(412).json("Een van de velden kan niet leeg zijn.")
     } else{
 
@@ -212,14 +212,14 @@ router.delete('/studentenhuis/:huisId?', function(req, res, next) {
 
     const huisId = req.params.huisId || '';
 
-    db.query("SET FOREIGN_KEY_CHECKS = 0")
+    db.query("SET FOREIGN_KEY_CHECKS = 0");
     db.query('DELETE FROM studentenhuis WHERE ID = ?', [huisId], (error, rows, fields) => {
 
-        if (huisId == ''){
+        if (huisId === ''){
             res.status(412).json("Vul een HuisId in")
         }
 
-        else if (rows.affectedRows == 0){
+        else if (rows.affectedRows === 0){
             res.status(404).json("Niet gevonden (huisId bestaat niet)")
         }
 
@@ -234,28 +234,28 @@ router.delete('/studentenhuis/:huisId?', function(req, res, next) {
 });
 
 router.post('/studentenhuis/:huisId?/maaltijd', function (req, res, next) {
-    var naam = req.body.naam;
-    var beschrijving = req.body.beschrijving;
-    var ingredienten = req.body.ingredienten;
-    var allergie = req.body.allergie;
-    var prijs = req.body.prijs;
-    var huisId = req.params.huisId || '';
+    const naam = req.body.naam;
+    const beschrijving = req.body.beschrijving;
+    const ingredienten = req.body.ingredienten;
+    const allergie = req.body.allergie;
+    const prijs = req.body.prijs;
+    const huisId = req.params.huisId || '';
 
-    if(naam == '' || beschrijving == '' || ingredienten == '' || allergie == '' || prijs == ''){
+    if(naam === '' || beschrijving === '' || ingredienten === '' || allergie === '' || prijs === ''){
         res.status(412).json("Een van de velden kan niet leeg zijn.")
     } else {
 
-    var token = (req.header('X-Access-Token')) || '';
+    const token = (req.header('X-Access-Token')) || '';
 
     auth.decodeToken(token, (err, payload) => {
 
-        var string = JSON.stringify(payload)
+        const string = JSON.stringify(payload);
 
-        var json = JSON.parse(string)
+        const json = JSON.parse(string);
 
         email = json.sub;
     });
-    console.log(email)
+    console.log(email);
 
     db.query('SELECT ID FROM user WHERE Email = "' + email + '"', (error, rows, fields) => {
 
@@ -263,22 +263,22 @@ router.post('/studentenhuis/:huisId?/maaltijd', function (req, res, next) {
         if (error) {
             res.status(500).json(error.toString())
         } else {
-            res.status(200)
-            var string = JSON.stringify(rows)
+            res.status(200);
+            const string = JSON.stringify(rows);
 
-            var json = JSON.parse(string)
+            const json = JSON.parse(string);
 
-            var x = json[0]
+            const x = json[0];
 
-            var UserId = x["ID"]
+            const UserId = x["ID"];
 
-            db.query("SET FOREIGN_KEY_CHECKS = 0")
+            db.query("SET FOREIGN_KEY_CHECKS = 0");
 
             db.query('INSERT INTO `maaltijd` (Naam, Beschrijving, Ingredienten, Allergie, Prijs, UserID, StudentenhuisID) VALUES (?,?,?,?,?,?,?)', [naam, beschrijving, ingredienten, allergie, prijs, UserId, huisId ], (error, rows, fields) => {
                 if (error) {
                     res.status(500).json(error.toString())
                 } else {
-                    res.status(200).json(rows)
+                    res.status(200).json(rows);
                     console.log(rows)
                 }
             });
@@ -332,21 +332,21 @@ router.put('/studentenhuis/:huisId?/maaltijd/:maaltijdId?', function(req, res, n
     const ingredienten = req.body.ingredienten;
     const allergie = req.body.allergie;
     const prijs = req.body.prijs;
-    var email;
-    var UserId;
+    let email;
+    let UserId;
 
-    if(huisId == '' || maaltijdId == '' || naam == '' || beschrijving == '' || ingredienten == '' || allergie == '' || prijs == ''){
+    if(huisId === '' || maaltijdId === '' || naam === '' || beschrijving === '' || ingredienten === '' || allergie === '' || prijs === ''){
         res.status(412).json("Een van de velden kan niet leeg zijn.");
     } else{
-    console.log(naam)
+    console.log(naam);
 
-    var token = (req.header('X-Access-Token')) || '';
+    const token = (req.header('X-Access-Token')) || '';
 
     auth.decodeToken(token, (err, payload) => {
 
-        var string = JSON.stringify(payload);
+        const string = JSON.stringify(payload);
 
-        var json = JSON.parse(string);
+        const json = JSON.parse(string);
 
         email = json.sub;
 
@@ -358,21 +358,21 @@ router.put('/studentenhuis/:huisId?/maaltijd/:maaltijdId?', function(req, res, n
             res.status(500).json(error.toString())
         } else {
             res.status(200);
-            var string = JSON.stringify(rows);
+            const string = JSON.stringify(rows);
 
-            var json = JSON.parse(string);
+            const json = JSON.parse(string);
 
-            var x = json[0];
+            const x = json[0];
 
             UserId = x["ID"];
 
-            var query = {
+            const query = {
                 sql: 'UPDATE `maaltijd` SET Naam = ?, Beschrijving = ?, Ingredienten = ?, Allergie = ?, Prijs = ?  WHERE ID = ? AND UserID = ? AND StudentenhuisID = ?',
                 values: [naam, beschrijving, ingredienten, allergie, prijs, maaltijdId, UserId, huisId],
                 timeout: 2000
             };
             db.query(query, (error, rows, fields) => {
-              if (rows.affectedRows == 0) {
+              if (rows.affectedRows === 0) {
                     res.status(404).json("Niet gevonden (huisId bestaat niet of geen toegang)");
 
                 }
@@ -380,7 +380,7 @@ router.put('/studentenhuis/:huisId?/maaltijd/:maaltijdId?', function(req, res, n
                 else if (error) {
                     res.status(500).json(error.toString())
 
-                } else if (db.query('SELECT UserID FROM maaltijd WHERE ID = "' + huisId + '"') == UserId) {
+                } else if (db.query('SELECT UserID FROM maaltijd WHERE ID = "' + huisId + '"') === UserId) {
 
                     res.status(200).json("Toevoeging gelukt")
                 } else {
@@ -394,19 +394,19 @@ router.put('/studentenhuis/:huisId?/maaltijd/:maaltijdId?', function(req, res, n
 
 router.delete('/studentenhuis/:huisId?/maaltijd/:maaltijdId?', function(req, res, next) {
 
-    var huisId = req.params.huisId || '';
-    var maaltijdId = req.params.maaltijdId || '';
-    var email;
-    var UserId;
+    const huisId = req.params.huisId || '';
+    const maaltijdId = req.params.maaltijdId || '';
+    let email;
+    let UserId;
 
 
-    var token = (req.header('X-Access-Token')) || '';
+    const token = (req.header('X-Access-Token')) || '';
 
     auth.decodeToken(token, (err, payload) => {
 
-        var string = JSON.stringify(payload)
+        const string = JSON.stringify(payload);
 
-        var json = JSON.parse(string)
+        const json = JSON.parse(string);
 
         email = json.sub;
 
@@ -417,24 +417,24 @@ router.delete('/studentenhuis/:huisId?/maaltijd/:maaltijdId?', function(req, res
         if (error) {
             res.status(500).json(error.toString())
         } else {
-            res.status(200)
-            var string = JSON.stringify(rows)
+            res.status(200);
+            const string = JSON.stringify(rows);
 
-            var json = JSON.parse(string)
+            const json = JSON.parse(string);
 
-            var x = json[0]
+            const x = json[0];
 
-            UserId = x["ID"]
+            UserId = x["ID"];
 
 
-            db.query("SET FOREIGN_KEY_CHECKS = 0")
+            db.query("SET FOREIGN_KEY_CHECKS = 0");
             db.query('DELETE FROM maaltijd WHERE StudentenhuisID = ? AND ID =? AND UserID = ?', [huisId, maaltijdId, UserId], (error, rows, fields) => {
 
-                if (huisId == '' || maaltijdId == '') {
+                if (huisId === '' || maaltijdId === '') {
                     res.status(412).json("Vul een HuisId en maaltijdId in")
                 }
 
-                else if (rows.affectedRows == 0) {
+                else if (rows.affectedRows === 0) {
                     res.status(404).json("Niet gevonden (huisId of maaltijdId bestaat niet of geen toegang)")
                 }
 
@@ -448,22 +448,22 @@ router.delete('/studentenhuis/:huisId?/maaltijd/:maaltijdId?', function(req, res
             })
         }
     })
-})
+});
 
 router.post('/studentenhuis/:huisId?/maaltijd/:maaltijdId?/deelnemers', function(req, res, next) {
-    var huisId = req.params.huisId;
-    var maaltijdId = req.params.maaltijdId;
-    var Email;
-    var UserId;
+    const huisId = req.params.huisId;
+    const maaltijdId = req.params.maaltijdId;
+    let Email;
+    let UserId;
 
 
-    var token = (req.header('X-Access-Token')) || '';
+    const token = (req.header('X-Access-Token')) || '';
 
     auth.decodeToken(token, (err, payload) => {
 
-        var string = JSON.stringify(payload)
+        const string = JSON.stringify(payload);
 
-        var json = JSON.parse(string)
+        const json = JSON.parse(string);
 
         Email = json.sub;
 
@@ -492,8 +492,8 @@ router.post('/studentenhuis/:huisId?/maaltijd/:maaltijdId?/deelnemers', function
 
                     console.log('werkt');
 
-                    db.query("SET FOREIGN_KEY_CHECKS = 0")
-                    db.query('INSERT INTO deelnemers (UserID, StudentenhuisID, MaaltijdID) VALUES (?,?,?)', [UserId, huisId, maaltijdId])
+                    db.query("SET FOREIGN_KEY_CHECKS = 0");
+                    db.query('INSERT INTO deelnemers (UserID, StudentenhuisID, MaaltijdID) VALUES (?,?,?)', [UserId, huisId, maaltijdId]);
                     {
 
 
