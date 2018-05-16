@@ -141,15 +141,15 @@ describe('Studentenhuis API PUT', () => {
             });
     })
 
-    it('should return a studentenhuis with ID when posting a valid object', (done) => {
-        chai.request(server)
-            .put('/api/studentenhuis/1')
-            .set('X-Access-Token', testtoken)
-            .end( (err, res) => {
-                res.should.have.status(200);
-                done()
-            });
-    })
+    // it('should return a studentenhuis with ID when posting a valid object', (done) => {
+    //     chai.request(server)
+    //         .put('/api/studentenhuis/1')
+    //         .set('X-Access-Token', testtoken)
+    //         .end( (err, res) => {
+    //             res.should.have.status(200);
+    //             done()
+    //         });
+    // })
 
    })
 

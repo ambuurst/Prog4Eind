@@ -207,24 +207,64 @@ router.get('/studentenhuis/:huisId?', function(req, res, next) {
 router.put('/studentenhuis/:huisId?', function(req, res, next) {
 
     const huisId = req.params.huisId;
+    var naam = req.body.naam;
+    var adres = req.body.adres;
+    var email;
+    var UserId;
 
-    if(huisId === ''){
+
+    if(huisId === '' || naam === '' || adres === ''){
         res.status(412).json({"message":"Een van de velden kan niet leeg zijn", "code":"412", "datetime":new Date().toLocaleString()})
     } else{
 
-    db.query('SELECT * FROM view_studentenhuis WHERE ID = ?', [huisId], (error, rows, fields) => {
-        if (error) {
-            res.status(500).json(error.toString())
-        } else {
-            if (rows.length > 0) {
-                res.status(200).json(rows)
-            }
+        var token = (req.header('X-Access-Token')) || '';
 
-            else{
-                res.status(404).json({"message":"Niet gevonden (huisId bestaat niet)", "code":"404", "datetime":new Date().toLocaleString()})
+        auth.decodeToken(token, (err, payload) => {
+
+            var string = JSON.stringify(payload)
+
+            var json = JSON.parse(string)
+
+            email = json.sub;
+
+
+        });
+
+        db.query('SELECT ID FROM user WHERE Email = "' + email + '"', (error, rows, fields) => {
+            if (error) {
+                res.status(500).json(error.toString())
+            } else {
+                res.status(200)
+                var string = JSON.stringify(rows)
+
+                var json = JSON.parse(string)
+
+                var x = json[0]
+
+                UserId = x["ID"]
+
+                var query = {
+                    sql: 'UPDATE `studentenhuis` SET Naam = ?, Adres = ? WHERE ID = ? AND UserID = ?',
+                    values: [naam, adres, huisId, UserId],
+                    timeout: 2000
+                }
+                db.query(query, (error, rows, fields) => {
+
+                    if (rows.affectedRows == 0) {
+                        res.status(404).json("Niet gevonden (huisId bestaat niet of geen toegang)")
+                    }
+
+                    else if (error) {
+                        res.status(500).json(error.toString())
+
+                    } else {
+
+                        res.status(200).json("Toevoeging gelukt")
+                    }
+
+                })
             }
-        }
-    })
+        })
 }});
 
 ////// Delete api/studentenhuis/{huisId} //////
