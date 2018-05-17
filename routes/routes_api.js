@@ -6,7 +6,7 @@ const db = require('../db/mysql-connector');
 
 ////// Catch all except login //////
 
-router.all( new RegExp("[^(\/login|\register)]"), function (req, res, next) {
+router.all( new RegExp("[^(\/login|\/register)]"), function (req, res, next) {
 
     console.log("VALIDATE TOKEN");
 
@@ -456,13 +456,9 @@ router.put('/studentenhuis/:huisId?/maaltijd/:maaltijdId?', function(req, res, n
 
                 }
 
-                else if (db.query('SELECT UserID FROM maaltijd WHERE ID = "' + huisId + '"') === UserId) {
-
-                    res.status(200).json("Toevoeging gelukt")
-                }
 
                 else {
-                  res.status(409).json({"message":"U mag deze data niet veranderen", "code":"409", "datetime":new Date().toLocaleString()})
+                  res.status(200).json("Toevoeging gelukt")
               }
             })
         }
@@ -590,18 +586,10 @@ router.post('/studentenhuis/:huisId?/maaltijd/:maaltijdId?/deelnemers', function
 
                 } else {
 
-                    db.query('SELECT Voornaam, Achternaam, Email FROM user WHERE ID = "' + UserId + '"', (error, rows, fields) => {
-                        const string = JSON.stringify(rows);
 
-                        const json = JSON.parse(string);
-
-
-                        res.status(200).json(json)
-                    });
-
+                    res.status(200).json("toevoeging gelukt")
                 }
             }
-
         }
     })
 });
